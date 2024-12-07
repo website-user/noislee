@@ -3,8 +3,8 @@ class NoisleeProcessor extends AudioWorkletProcessor {
         return [
             {name: 'freqShift', defaultValue: 100, minValue: 0, maxValue: 500},
             {name: 'dissonanceFactor', defaultValue: 1.2, minValue: 1, maxValue: 2},
-            {name: 'inputGain', defaultValue: 1.0, minValue: 0.1, maxValue: 5},
-            {name: 'outputVolume', defaultValue: 0.5, minValue: 0, maxValue: 1},
+            {name: 'inputGain', defaultValue: 5, minValue: 0.1, maxValue: 5},
+            {name: 'outputVolume', defaultValue: 0.8, minValue: 0, maxValue: 1},
             {name: 'rejectionBandwidth', defaultValue: 20, minValue: 5, maxValue: 50}
         ];
     }
