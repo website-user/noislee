@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noislee</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Noislee</h1>
+        <p class="description">An experimental audio tool that creates dissonant harmonies with your music.</p>
+        
+        <div class="controls">
+            <button id="toggleButton" class="btn" data-tooltip="Start or stop the audio processing">
+                Start Processing
+            </button>
+            
+            <div class="slider-container">
+                <label for="freqShift" data-tooltip="Shifts the frequency of the generated sound relative to the input. Higher values create more dramatic pitch differences.">
+                    Frequency Shift (Hz)
+                </label>
+                <input type="range" id="freqShift" min="0" max="500" value="100" class="slider">
+                <span id="freqShiftValue">100</span>
+            </div>
+            
+            <div class="slider-container">
+                <label for="dissonanceFactor" data-tooltip="Multiplies the detected frequencies to create dissonance. Values further from 1.0 create more intense clashing sounds.">
+                    Dissonance Factor
+                </label>
+                <input type="range" id="dissonanceFactor" min="1" max="2" step="0.1" value="1.2" class="slider">
+                <span id="dissonanceValue">1.2</span>
+            </div>
+            
+            <div class="slider-container">
+                <label for="inputGain" data-tooltip="Amplifies the input signal before processing. Higher values make the effect more sensitive to quiet sounds.">
+                    Input Gain
+                </label>
+                <input type="range" id="inputGain" min="0.1" max="5" step="0.1" value="1.0" class="slider">
+                <span id="inputGainValue">1.0</span>
+            </div>
+            
+            <div class="slider-container">
+                <label for="outputVolume" data-tooltip="Controls the volume of the generated sounds. Use this to balance Noislee's output with the original music.">
+                    Output Volume
+                </label>
+                <input type="range" id="outputVolume" min="0" max="1" step="0.1" value="0.5" class="slider">
+                <span id="outputVolumeValue">0.5</span>
+            </div>
+            
+            <div class="slider-container">
+                <label for="rejectionBandwidth" data-tooltip="Controls how aggressively Noislee filters out its own output from the input. Higher values reduce feedback but might affect music detection.">
+                    Rejection Bandwidth (Hz)
+                </label>
+                <input type="range" id="rejectionBandwidth" min="5" max="50" step="5" value="20" class="slider">
+                <span id="rejectionBandwidthValue">20</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/audioProcessor.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
