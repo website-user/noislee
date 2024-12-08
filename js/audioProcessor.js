@@ -31,8 +31,19 @@ class AudioProcessor {
     async initialize() {
         try {
             console.log('Initializing audio context...');
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                sinkId: 'mixing'  // Experimental attempt at audio mixing
+            });
             
+            // Set audio session for better iOS handling
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: 'Nature Sounds',
+                    artist: 'Noislee',
+                    album: 'Background Sounds'
+                });
+            }
+    
             console.log('Requesting microphone access...');
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
@@ -41,6 +52,7 @@ class AudioProcessor {
                     autoGainControl: false
                 }
             });
+            
             
             console.log('Microphone access granted, creating input node...');
             this.inputNode = this.audioContext.createMediaStreamSource(stream);
