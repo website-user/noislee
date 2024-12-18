@@ -1,31 +1,48 @@
 export class AudioProcessor {
-    constructor() {
+    constructor(modules = []) {
         this.audioContext = null;
         this.micStream = null;
         this.workletNode = null;
-        this.inputGainNode = null;
-        this.outputGainNode = null;
+        this.outputGain = null;
+        this.modules = modules;
     }
 
     async initialize() {
         try {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
             await this.audioContext.audioWorklet.addModule('/src/noisleeProcessor.js');
-            this.micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            this.micStream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false,
+                    latency: 0,
+                    channelCount: 1
+                } 
+            });
             
-            // Create nodes
+            // Create initial source
             const source = this.audioContext.createMediaStreamSource(this.micStream);
-            this.inputGainNode = this.audioContext.createGain();
-            this.workletNode = new AudioWorkletNode(this.audioContext, 'noislee-processor');
-            this.outputGainNode = this.audioContext.createGain();
             
-            // Connect nodes
-            source
-                .connect(this.inputGainNode)
-                .connect(this.workletNode)
-                .connect(this.outputGainNode)
-                .connect(this.audioContext.destination);
+            // Chain all modules together
+            let currentNode = source;
+            for (const module of this.modules) {
+                const nextNode = module.connect(this.audioContext, currentNode, this.audioContext.destination);
+                if (nextNode) {
+                    currentNode = nextNode;
+                }
+            }
+            
+            // Create and connect worklet node
+            this.workletNode = new AudioWorkletNode(this.audioContext, 'noislee-processor');
+            currentNode.connect(this.workletNode);
+
+            // Create and connect output gain node
+            this.outputGain = this.audioContext.createGain();
+            this.outputGain.gain.value = 1.0; // Default value
+            this.workletNode.connect(this.outputGain);
+            this.outputGain.connect(this.audioContext.destination);
             
             return true;
         } catch (error) {
@@ -34,30 +51,21 @@ export class AudioProcessor {
         }
     }
 
-    setInputGain(value) {
-        if (this.inputGainNode) {
-            this.inputGainNode.gain.value = value;
-        }
-    }
-
     setOutputGain(value) {
-        if (this.outputGainNode) {
-            this.outputGainNode.gain.value = value;
+        if (this.outputGain) {
+            this.outputGain.gain.value = value;
         }
     }
 
     stop() {
+        this.modules.forEach(module => module.disconnect());
         if (this.workletNode) {
             this.workletNode.disconnect();
             this.workletNode = null;
         }
-        if (this.inputGainNode) {
-            this.inputGainNode.disconnect();
-            this.inputGainNode = null;
-        }
-        if (this.outputGainNode) {
-            this.outputGainNode.disconnect();
-            this.outputGainNode = null;
+        if (this.outputGain) {
+            this.outputGain.disconnect();
+            this.outputGain = null;
         }
         if (this.micStream) {
             this.micStream.getTracks().forEach(track => track.stop());

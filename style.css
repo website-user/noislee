@@ -43,4 +43,15 @@ button:disabled {
 .gain-control span {
     min-width: 40px;
     text-align: left;
+}
+
+.module-container {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+}
+
+.module-container .gain-control {
+    margin: 0.5rem 0;
 } 
